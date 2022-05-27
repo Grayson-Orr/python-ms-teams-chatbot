@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from .user_profile_dialog import UserProfileDialog
+from .survey_dialog import SurveyDialog
 
-__all__ = ["UserProfileDialog"]
+__all__ = ["SurveyDialog"]

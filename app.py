@@ -20,7 +20,7 @@ from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
 
 from config import DefaultConfig
-from dialogs import UserProfileDialog
+from dialogs import SurveyDialog
 from bots import DialogBot
 
 CONFIG = DefaultConfig()
@@ -73,7 +73,7 @@ CONVERSATION_STATE = ConversationState(MEMORY)
 USER_STATE = UserState(MEMORY)
 
 # create main dialog and bot
-DIALOG = UserProfileDialog(USER_STATE)
+DIALOG = SurveyDialog(USER_STATE)
 BOT = DialogBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
@@ -93,10 +93,12 @@ async def messages(req: Request) -> Response:
         return json_response(data=response.body, status=response.status)
     return Response(status=HTTPStatus.OK)
 
+
 def init_func(argv):
     APP = web.Application(middlewares=[aiohttp_error_middleware])
     APP.router.add_post("/api/messages", messages)
     return APP
+
 
 if __name__ == "__main__":
     try:
