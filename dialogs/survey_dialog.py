@@ -13,15 +13,17 @@ from botbuilder.dialogs.prompts import (
     PromptOptions,
 )
 from botbuilder.core import MessageFactory, UserState
+from pyodbc import connect
 
 from data_models import Survey
 
 
 class SurveyDialog(ComponentDialog):
-    def __init__(self, user_state: UserState):
+    def __init__(self, user_state: UserState, conn_string: str):
         super(SurveyDialog, self).__init__(SurveyDialog.__name__)
 
         self.survey_accessor = user_state.create_property("Survey")
+        self.conn_string = conn_string
 
         self.add_dialog(
             WaterfallDialog(
@@ -61,7 +63,7 @@ class SurveyDialog(ComponentDialog):
         step_context.values["question_two"] = step_context.result
         return await step_context.prompt(
             ConfirmPrompt.__name__,
-            PromptOptions(prompt=MessageFactory.text("Is this ok?")),
+            PromptOptions(prompt=MessageFactory.text("Are you happy with your answers?")),
         )
 
     async def summary_step(
@@ -74,8 +76,15 @@ class SurveyDialog(ComponentDialog):
             survey.question_one = step_context.values["question_one"]
             survey.question_two = step_context.values["question_two"]
 
+            with connect(self.conn_string) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO Survey (QuestionOne, QuestionTwo) VALUES (?, ?)  
+                    """, survey.question_one, survey.question_two)
+                    conn.commit()
+
         await step_context.context.send_activity(
-            MessageFactory.text("Thank you")
+            MessageFactory.text("Thank you for completing the survey. We appreciate your feedback.")
         )
 
         return await step_context.end_dialog()

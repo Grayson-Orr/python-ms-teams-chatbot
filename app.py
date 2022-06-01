@@ -73,7 +73,7 @@ CONVERSATION_STATE = ConversationState(MEMORY)
 USER_STATE = UserState(MEMORY)
 
 # create main dialog and bot
-DIALOG = SurveyDialog(USER_STATE)
+DIALOG = SurveyDialog(USER_STATE, CONFIG.CONN_STRING)
 BOT = DialogBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
